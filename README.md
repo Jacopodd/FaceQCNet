@@ -2,8 +2,11 @@
 
 # FaceQCNet: Face Quality-Control Network
 
+**FaceQCNet** è una rete leggera per la predizione di attributi facciali con attenzione alla qualità del software.
+
 **FaceQCNet** è una parte di un progetto accademico sviluppato nell’ambito dell’iniziativa **FVAB** (Fondamenti di Visione Artificiale e Biometria) presso l’Università degli Studi di Salerno.  
-Il progetto ha come obiettivo la **mitigazione del bias demografico** nei modelli di riconoscimento di attributi facciali soft (come genere, età, sorriso, colore capelli, ecc.), con particolare attenzione alle disuguaglianze tra gruppi etnici, di genere e di età.
+Il progetto ha come obiettivo la **mitigazione del bias demografico** nei modelli di riconoscimento di attributi facciali soft (come genere, età, sorriso, colore capelli, ecc.), con particolare attenzione alle disuguaglianze tra gruppi etnici, di genere e di età. Viene esplorata
+l'integrazione di dati sintetici generato con StableDiffusion/StyleGan3 per mitigare bias etnici, di genere e di età presenti in un dataset come CelebA.
 
 FaceQCNet rappresenta la prima fase di una pipeline completa finalizzata al **riaddestramento del modello [Slim-CNN](https://github.com/gtamba/pytorch-slim-cnn)**, utilizzando immagini sintetiche di alta qualità, accuratamente filtrate e annotate.  
 Questi dati bilanciati sono fondamentali per costruire un dataset *synthetic-aware* ed equo, utile per valutazioni comparative e mitigazione dei bias nei modelli biometrici.
@@ -32,10 +35,12 @@ Questi dati bilanciati sono fondamentali per costruire un dataset *synthetic-awa
 
 ---
 
-## Requisiti
-Installa tutte le dipendenze con:
+# Installazione
+clona la repository e installa le dipendenze con:
 
 ```bash
+git clone https://github.com/Jacopodd/FaceQCNet.git
+cd FaceQCNet
 pip install -r requirements.txt
 ```
 
