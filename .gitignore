@@ -18,5 +18,11 @@ ENV/
 
 data/celeba/*
 data/synthetic/*
+!data/synthetic/.gitkeep
+
 data/quality_images/*
+!data/quality_images/.gitkeep
+
 data/attributes_detected/*
+!data/attributes_detected/.gitkeep
+
