@@ -1,0 +1,26 @@
+FaceQCNet - NOTICE
+
+This project includes third-party code under the following licenses:
+
+---
+
+1. MagFace
+Repository: https://github.com/IrvingMeng/MagFace
+License: Apache License 2.0
+
+The code for facial quality evaluation (model and architecture) is derived from MagFace.
+Original LICENSE included in `models/` directory.
+
+---
+
+2. Facer
+Repository: https://github.com/FacePerceiver/facer
+License: MIT License
+
+The code used for facial attribute prediction is based on the Facer project.
+Original LICENSE included in the Facer package upon installation.
+
+---
+
+This project, FaceQCNet, is licensed under the Apache License 2.0.
+You may not use the included third-party components except in compliance with their respective licenses.

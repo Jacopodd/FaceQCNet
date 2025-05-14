@@ -1,0 +1,7 @@
+torch
+torchvision
+tqdm
+Pillow
+opencv-python
+
+git+https://github.com/FacePerceiver/facer.git@main
