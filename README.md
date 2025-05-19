@@ -148,6 +148,6 @@ Se utilizzi questo framework in pubblicazioni accademiche, cita i seguenti lavor
 ## 📩 Contatti
 
 Jacopo de Dominicis  
-MITIGAZIONE BIAS DEMOGRAFICO – FVAB 2025  
-Email: [Inserire contatto]
+MITIGAZIONE BIAS DEMOGRAFICO – Fondamenti di Visione e Biometria 2025  
+Email: jacopodedominicisdeveloper@gmail.com
 
