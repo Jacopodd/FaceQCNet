@@ -4,6 +4,7 @@ from PIL import Image
 import os
 from iresnet import iresnet100
 from tqdm import tqdm
+import gdown
 
 # === CONFIGURAZIONE ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +13,16 @@ MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "magface_epoch_00025.pth")
 INPUT_DIR = os.path.join(BASE_DIR, "..", "data", "synthetic")
 OUTPUT_DIR = os.path.join(BASE_DIR, "..", "data", "quality_images")
 TXT_PATH = os.path.join(OUTPUT_DIR, "quality_scores.txt")
+
+# === CONTROLLO E DOWNLOAD MODELLO ===
+if not os.path.exists(MODEL_PATH):
+    print("[↓] Modello non trovato. Avvio download da Google Drive...")
+    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    file_id = "1Bd87admxOZvbIOAyTkGEntsEz3fyMt7H"  # Sostituisci con il vero ID se cambia
+    url = f"https://drive.google.com/uc?id={file_id}"
+    gdown.download(url, MODEL_PATH, quiet=False)
+else:
+    print("[✔] Modello già presente, proseguo.")
 
 # === CARICAMENTO MODELLO ===
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -26,6 +37,9 @@ filtered_dict = {k.replace('features.module.', ''): v
 model.load_state_dict(filtered_dict, strict=False)
 model.to(device)
 model.eval()
+
+print("[🚀] Modello caricato e pronto all'uso su", device)
+
 
 # === PREPROCESSING ===
 transform = transforms.Compose([
