@@ -1,103 +1,153 @@
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+# FaceQCNet
 
-# FaceQCNet: Face Quality-Control Network
-
-**FaceQCNet** è una rete leggera per la predizione di attributi facciali con attenzione alla qualità del software.
-
-**FaceQCNet** è una parte di un progetto accademico sviluppato nell’ambito dell’iniziativa **FVAB** (Fondamenti di Visione Artificiale e Biometria) presso l’Università degli Studi di Salerno.  
-Il progetto ha come obiettivo la **mitigazione del bias demografico** nei modelli di riconoscimento di attributi facciali soft (come genere, età, sorriso, colore capelli, ecc.), con particolare attenzione alle disuguaglianze tra gruppi etnici, di genere e di età. Viene esplorata
-l'integrazione di dati sintetici generato con StableDiffusion/StyleGan3 per mitigare bias etnici, di genere e di età presenti in un dataset come CelebA.
-
-FaceQCNet rappresenta la prima fase di una pipeline completa finalizzata al **riaddestramento del modello [Slim-CNN](https://github.com/gtamba/pytorch-slim-cnn)**, utilizzando immagini sintetiche di alta qualità, accuratamente filtrate e annotate.  
-Questi dati bilanciati sono fondamentali per costruire un dataset *synthetic-aware* ed equo, utile per valutazioni comparative e mitigazione dei bias nei modelli biometrici.
+**FaceQCNet** è un framework modulare per l'analisi avanzata della qualità e degli attributi facciali soft in immagini statiche. Combina pipeline di deep learning basate su **MagFace**, **Facer** (FaRL) e **FairFace** per effettuare inferenze affidabili e demograficamente sensibili, utili per scenari di fairness audit, bias mitigation e soft-biometric profiling.
 
 ---
 
-## Tecnologie principali
+## 🧬 Architettura del Sistema
 
-- **[MagFace](https://github.com/IrvingMeng/MagFace)**  
-  Utilizzato per valutare la **qualità delle immagini facciali** tramite la magnitudine dell'embedding.  
-  Solo le immagini con qualità ≥ 20 vengono ammesse alla fase successiva di analisi.
+FaceQCNet è composto da tre pipeline interconnesse:
 
-- **[Facer](https://github.com/FacePerceiver/facer)**  
-  Framework transformer-based per l’**estrazione automatica di attributi facciali soft**, preaddestrato su CelebA.  
-  Fornisce una rappresentazione dettagliata del volto includendo attributi come colore capelli, età, genere, trucco, sorriso e altri 40+ soft labels.
+### 1. **MagFace Quality Scoring**
+- Architettura: `iresnet100`
+- Metodo: magnitudo del deep feature embedding (L2-norm)
+- Soglia di accettazione predefinita: `||f||₂ ≥ 20.0`
+- Uscita: immagini filtrate ad alta qualità
+- Fonte: [MagFace – IrvingMeng/MagFace](https://github.com/IrvingMeng/MagFace)
+
+### 2. **Facer Attribute Recognition**
+- Backbone: `retinaface/mobilenet` (face detection)
+- Classificatore: `farl/celeba/224` (multi-label attribute prediction)
+- Dataset di riferimento: CelebA
+- Uscita: probabilità binarie per 40+ attributi soft
+- Fonte: [FacePerceiver/facer](https://github.com/FacePerceiver/facer)
+
+### 3. **FairFace Demographic Classification**
+- Modello: `resnet34` fine-tuned per task multi-classe
+- Output: classificazione [etnia (7), genere (2), età (9 classi)]
+- Dataset: FairFace, bilanciato per razza/genere
+- Fonte: [dchen236/FairFace](https://github.com/dchen236/FairFace)
 
 ---
 
-## Obiettivo operativo
+## 🛠 Requisiti e Setup
 
-1. **Valutare automaticamente** la qualità di immagini sintetiche generate (es. da StyleGAN3 o Stable Diffusion)
-2. **Scartare immagini di bassa qualità**
-3. **Annotare automaticamente** le immagini valide con attributi CelebA via Facer
-4. **Generare dataset annotati e bilanciati** da usare per il riaddestramento di Slim-CNN
-5. **Mitigare il bias demografico** nei sistemi di analisi facciale soft
+### Dipendenze principali
 
----
+- `torch`, `torchvision`, `facer`
+- `Pillow`, `tqdm`, `gdown`
 
-# Installazione
-clona la repository e installa le dipendenze con:
+### Installazione
 
 ```bash
-git clone https://github.com/Jacopodd/FaceQCNet.git
-cd FaceQCNet
+git clone https://github.com/tuo-username/faceqcnet.git
+cd faceqcnet
 pip install -r requirements.txt
 ```
 
-**Nota**: il pacchetto facer viene installato direttamente da GitHub.
+### Scaricamento modelli
+
+- `magface_epoch_00025.pth` sarà scaricato automaticamente via `gdown`
+- `res34_fair_align_multi_7_20190809.pt` va posto in `models/`
 
 ---
 
-## Come usare
-### 1. Preparare le immagini sintetiche
-Posiziona le immagini da analizzare in:
+## 📈 Pipeline di Inferenza
+
+### 1. Filtraggio qualità volto con MagFace
 
 ```bash
-data/synthetic/
+python script/quality_check.py
 ```
 
-### 2. Valutare la qualità (MagFace)
-Esegui:
-```bash
-python scripts/quality_check.py
-```
+**Input:** `data/synthetic/`  
+**Output:** `data/quality_images/` + `quality_scores.txt`
 
-- Salverà le immagini con punteggio ≥ 20 in `data/quality_images/`
-- Crea anche un file `quality_scores.txt` con i punteggi ottenuti
+- Pre-processing: resize(112×112), normalize [-1, 1]
+- Threshold decision based on L2-norm of embedding
 
-### 3. Estrarre attributi facciali (Facer)
-Esegui:
+### 2. Estrazione attributi (Facer + FairFace)
 
 ```bash
-python scripts/extract_attributes.py
+python script/extract_attributes.py
 ```
 
-- Analizza tutte le immagini in `quality_images/`
-- Per ogni immagine genera un file `.txt` in `attributes_detected/`
-- Gli attributi includono colore dei capelli e tutti i soft attributes di CelebA
+**Input:** `data/quality_images/`  
+**Output:** `.txt` descrittivi in `data/attributes_detected/`
 
---- 
+- Facer → parsing colore capelli, sorriso, trucco, barba, occhiali...
+- FairFace → classificazione demografica robusta (età, genere, etnia)
 
-## Obiettivo
-Questo progetto è parte dell’iniziativa **FVAB** per la mitigazione del bias demografico nei modelli di riconoscimento facciale soft.
-L’obiettivo è garantire che solo immagini di qualità sufficiente vengano utilizzate per analisi di attributi, riducendo distorsioni dovute a qualità scarsa o squilibrata
+---
+
+## 📂 Organizzazione del Repository
+
+```
+faceqcnet/
+│
+├── models/                     # Contiene pesi pre-addestrati
+├── data/
+│   ├── synthetic/              # Immagini non valutate
+│   ├── quality_images/        # Output filtrato da MagFace
+│   └── attributes_detected/   # File testuali con predizioni
+├── script/                       # Codice sorgente
+│   ├── quality_check.py
+│   └── extract_attributes.py
+│   └── clean_outputs.py       # Pulisce le directory data/quality_images e attributes_detected
+├── README.md
+└── NOTICE
+```
+
+---
+
+## 📤 Output Esemplificativo
+
+```
+COLORE CAPELLI:
+- Black Hair (0.96)
+- Blond Hair (0.54)
+
+Attributi rilevati:
+Smiling: 0.91
+Wearing_Lipstick: 0.88
+Heavy_Makeup: 0.65
+Eyeglasses: 0.12
+
+--- FairFace Prediction ---
+Razza stimata: Southeast_Asian
+Genere stimato: Female
+Età stimata: 30-39
+```
 
 ---
 
 ## 📜 Licenza
 
-Questo progetto è distribuito sotto licenza **Apache License 2.0**.  
-Puoi liberamente utilizzarlo, modificarlo e ridistribuirlo, a patto di rispettare i termini della licenza.
+**FaceQCNet** è distribuito sotto licenza **Apache License 2.0**.
 
-Consulta il file [`LICENSE`](./LICENSE) per il testo completo.
+Componenti terze incluse:
+
+- **MagFace** – Apache 2.0
+- **Facer** – MIT License
+- **FairFace** – Creative Commons Attribution 4.0 (CC BY 4.0)
+
+Consulta il file [`NOTICE`](NOTICE) per dettagli completi sulle attribuzioni.
 
 ---
 
-### 📎 Terze parti
+## 📚 Citazioni Originali
 
-FaceQCNet integra codice e modelli provenienti da progetti open source:
+Se utilizzi questo framework in pubblicazioni accademiche, cita i seguenti lavori:
 
-- **[MagFace](https://github.com/IrvingMeng/MagFace)** – Licenza Apache 2.0  
-- **[Facer](https://github.com/FacePerceiver/facer)** – Licenza MIT
+- MagFace: *CVPR 2021 – Meng et al.*
+- Facer: *FaceXFormer/FaRL – 2023-2024*
+- FairFace: *CVPR 2020 – K. Joumaa & D. Chen*
 
-Per maggiori dettagli, consulta il file [`NOTICE`](./NOTICE) incluso nel repository.
+---
+
+## 📩 Contatti
+
+Jacopo de Dominicis  
+MITIGAZIONE BIAS DEMOGRAFICO – FVAB 2025  
+Email: [Inserire contatto]
+

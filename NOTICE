@@ -1,6 +1,6 @@
 FaceQCNet - NOTICE
 
-This project includes third-party code under the following licenses:
+This project includes third-party code and datasets under the following licenses:
 
 ---
 
@@ -9,7 +9,7 @@ Repository: https://github.com/IrvingMeng/MagFace
 License: Apache License 2.0
 
 The code for facial quality evaluation (model and architecture) is derived from MagFace.
-Original LICENSE included in `models/` directory.
+The original LICENSE file is included in the `models/` directory.
 
 ---
 
@@ -18,7 +18,21 @@ Repository: https://github.com/FacePerceiver/facer
 License: MIT License
 
 The code used for facial attribute prediction is based on the Facer project.
-Original LICENSE included in the Facer package upon installation.
+The original LICENSE file is included in the Facer package upon installation.
+
+---
+
+3. FairFace
+Repositories:
+- https://github.com/dchen236/FairFace
+- https://github.com/joojs/fairface
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+The dataset and pretrained models for facial attribute prediction (age, gender, race) are derived from the FairFace project.
+Original authors: **Kareem Joumaa** and **David Chen**.
+
+Use of the FairFace dataset requires attribution and compliance with the CC BY 4.0 license.
+Note: The dataset includes images from the YFCC100M collection, which are subject to individual Creative Commons licenses. Attribution to original image authors should be provided when redistributing or publishing these images. Use of MD5 hashes is recommended for tracking license sources (see FairFace GitHub issue #5).
 
 ---
 
