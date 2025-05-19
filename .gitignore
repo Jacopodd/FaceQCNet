@@ -15,6 +15,9 @@ ENV/
 *.swp
 *.pth
 
+models/*.pth
+
+
 data/celeba/*
 data/synthetic/*
 !data/synthetic/.gitkeep
