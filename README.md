@@ -4,6 +4,29 @@
 
 ---
 
+## Obiettivo
+FaceQCNet è uno strumento che ci aiuta a scegliere solo le immagini sintetiche nitide e realistiche, 
+per essere usate in un progetto di intelligenza artificiale. 
+Dopo aver selezionato le immagini migliori, analizza il volto di ciascuna per capire alcune caratteristiche, 
+come il colore dei capelli, l’etnia, il genere e l’età. In questo modo possiamo sapere esattamente che tipo di 
+persone stiamo rappresentando con queste immagini artificiali. 
+Tutto questo ci serve per allenare meglio un modello di intelligenza artificiale, chiamato Slim-CNN, così che non 
+sia ingiusto verso alcune categorie di persone (ad esempio donne o persone di pelle scura).
+
+FaceQCNet è un modulo di prefiltraggio e annotazione semantica volto alla selezione di immagini sintetiche ad alta qualità, 
+destinate alla mitigazione del bias nei modelli di riconoscimento di attributi facciali soft. 
+Le immagini vengono selezionate solo se superano una soglia di qualità visiva (quality score ≥ 20), calcolata tramite il modello MagFace. 
+Successivamente, ciascuna immagine viene analizzata mediante due pipeline:
+- **Facer** per l’estrazione di attributi binari secondo lo schema CelebA (es. colore dei capelli, presenza di occhiali, sorriso);
+- **FairFace** per la stima di attributi demografici sensibili: etnia, genere ed età.
+
+Questa doppia annotazione consente di costruire un dataset sintetico demograficamente controllato. 
+Il dataset risultante sarà impiegato per il riaddestramento della rete Slim-CNN, con l’obiettivo di migliorare l’equità delle predizioni, 
+soprattutto nei confronti di gruppi demografici sottorappresentati nei dataset reali.
+
+---
+
+
 ## 🧬 Architettura del Sistema
 
 FaceQCNet è composto da tre pipeline interconnesse:
